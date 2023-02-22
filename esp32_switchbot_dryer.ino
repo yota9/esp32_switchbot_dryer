@@ -12,6 +12,9 @@ static const unsigned long MinDeltaDryerTime = 3 * 1000 * 60 * 60; // 3 hours
 // Min and max cm distance delta to consider ~10cm robot movement
 static const unsigned MinDistanceDelta = 5;
 static const unsigned MaxDistanceDelta = 15;
+// Min and max valid distances used to set DefaultDistance
+static const unsigned MinDistance = 13;
+static const unsigned MaxDistance = 27;
 
 // Device service
 static const BLEUUID ServiceUUID("cba20d00-224d-11e6-9fb8-0002a5d5c51b");
@@ -125,8 +128,11 @@ static float measureDistance(const unsigned Times = 1) {
 }
 
 static void updateDefaultDistance(struct Context *Ctx) {
-  Ctx->DefaultDistance = measureDistance(/*Times*/3);
-  Serial.print("Updating default distance to ");
+  Serial.print("Updating default distance to... ");
+  do {
+    Ctx->DefaultDistance = measureDistance(/*Times*/3);
+    delay(500);
+  } while (Ctx->DefaultDistance < MinDistance || Ctx->DefaultDistance > MaxDistance);
   Serial.println(Ctx->DefaultDistance);
 }
 
